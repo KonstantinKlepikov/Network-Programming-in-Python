@@ -7,5 +7,5 @@ if __name__ == '__main__':
     # Translating characters back into bytes before sending them.
     output_characters = 'We copy you down, Eagle.\n'
     output_bytes = output_characters.encode('utf-8')
-    with open('eagle.txt', 'wb') as f:
+    with open('code_file/eagle.txt', 'wb') as f:
         f.write(output_bytes)
