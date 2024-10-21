@@ -1,4 +1,7 @@
-import argparse, socket, sys
+import argparse
+import socket
+import sys
+
 
 def server(host, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -23,10 +26,11 @@ def server(host, port):
         sc.close()
         print('  Socket closed')
 
+
 def client(host, port, bytecount):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     bytecount = (bytecount + 15) // 16 * 16  # round up to a multiple of 16
-    message = b'capitalize this!'  # 16-byte message to repeat over and over
+    message = b'capitalizethis!'  # 16-byte message to repeat over and over
 
     print('Sending', bytecount, 'bytes of data, in chunks of 16 bytes')
     sock.connect((host, port))
@@ -56,16 +60,29 @@ def client(host, port, bytecount):
     print()
     sock.close()
 
+
 if __name__ == '__main__':
     roles = ('client', 'server')
     parser = argparse.ArgumentParser(description='Get deadlocked over TCP')
     parser.add_argument('role', choices=roles, help='which role to play')
-    parser.add_argument('host', help='interface the server listens at;'
-                        ' host the client sends to')
-    parser.add_argument('bytecount', type=int, nargs='?', default=16,
-                        help='number of bytes for client to send (default 16)')
-    parser.add_argument('-p', metavar='PORT', type=int, default=1060,
-                        help='TCP port (default 1060)')
+    parser.add_argument(
+        'host',
+        help='interface the server listens at;' ' host the client sends to',
+    )
+    parser.add_argument(
+        'bytecount',
+        type=int,
+        nargs='?',
+        default=16,
+        help='number of bytes for client to send (default 16)',
+    )
+    parser.add_argument(
+        '-p',
+        metavar='PORT',
+        type=int,
+        default=1060,
+        help='TCP port (default 1060)',
+    )
     args = parser.parse_args()
     if args.role == 'client':
         client(args.host, args.p, args.bytecount)
