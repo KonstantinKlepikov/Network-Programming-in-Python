@@ -1,6 +1,7 @@
 import socket
 from argparse import ArgumentParser
 
+
 def server(address):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -24,6 +25,7 @@ def server(address):
     sc.close()
     sock.close()
 
+
 def client(address):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(address)
@@ -33,13 +35,23 @@ def client(address):
     sock.sendall(b'Simple is better than complex.\n')
     sock.close()
 
+
 if __name__ == '__main__':
     parser = ArgumentParser(description='Transmit & receive a data stream')
-    parser.add_argument('hostname', nargs='?', default='127.0.0.1',
-                        help='IP address or hostname (default: %(default)s)')
+    parser.add_argument(
+        'hostname',
+        nargs='?',
+        default='127.0.0.1',
+        help='IP address or hostname (default: %(default)s)',
+    )
     parser.add_argument('-c', action='store_true', help='run as the client')
-    parser.add_argument('-p', type=int, metavar='port', default=1060,
-                        help='TCP port number (default: %(default)s)')
+    parser.add_argument(
+        '-p',
+        type=int,
+        metavar='port',
+        default=1060,
+        help='TCP port number (default: %(default)s)',
+    )
     args = parser.parse_args()
     function = client if args.c else server
     function((args.hostname, args.p))
