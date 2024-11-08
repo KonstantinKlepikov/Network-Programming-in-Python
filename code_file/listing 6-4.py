@@ -1,8 +1,13 @@
-import argparse, socket, ssl, sys, textwrap
+import argparse
 import ctypes
+import socket
+import ssl
+import sys
+import textwrap
 from pprint import pprint
 
-def open_tls(context, address, server=False):
+
+def open_tls(context: ssl.SSLContext, address, server=False):
     raw_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if server:
         raw_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -17,18 +22,24 @@ def open_tls(context, address, server=False):
         raw_sock.connect(address)
         return context.wrap_socket(raw_sock)
 
-def describe(ssl_sock, hostname, server=False, debug=False):
+
+def describe(ssl_sock: ssl.SSLContext, hostname, server=False, debug=False):
     cert = ssl_sock.getpeercert()
     if cert is None:
         say('Peer certificate', 'none')
     else:
         say('Peer certificate', 'provided')
         subject = cert.get('subject', [])
-        names = [name for names in subject for (key, name) in names
-                 if key == 'commonName']
+        names = [
+            name
+            for names in subject
+            for (key, name) in names
+            if key == 'commonName'
+        ]
         if 'subjectAltName' in cert:
-            names.extend(name for (key, name) in cert['subjectAltName']
-                         if key == 'DNS')
+            names.extend(
+                name for (key, name) in cert['subjectAltName'] if key == 'DNS'
+            )
 
         say('Name(s) on peer certificate', *names or ['none'])
         if (not server) and names:
@@ -60,11 +71,17 @@ def describe(ssl_sock, hostname, server=False, debug=False):
 
     return cert
 
+
 class PySSLSocket(ctypes.Structure):
     """The first few fields of a PySSLSocket (see Python's Modules/_ssl.c)."""
 
-    _fields_ = [('ob_refcnt', ctypes.c_ulong), ('ob_type', ctypes.c_void_p),
-                ('Socket', ctypes.c_void_p), ('ssl', ctypes.c_void_p)]
+    _fields_ = [
+        ('ob_refcnt', ctypes.c_ulong),
+        ('ob_type', ctypes.c_void_p),
+        ('Socket', ctypes.c_void_p),
+        ('ssl', ctypes.c_void_p),
+    ]
+
 
 def SSL_get_version(ssl_sock):
     """Reach behind the scenes for a socket's TLS protocol version."""
@@ -79,6 +96,7 @@ def SSL_get_version(ssl_sock):
     version_bytestring = lib.SSL_get_version(struct.ssl)
     return version_bytestring.decode('ascii')
 
+
 def lookup(prefix, name):
     if not name.startswith(prefix):
         name = prefix + name
@@ -87,35 +105,71 @@ def lookup(prefix, name):
     except AttributeError:
         matching_names = (s for s in dir(ssl) if s.startswith(prefix))
         message = 'Error: {!r} is not one of the available names:\n {}'.format(
-            name, ' '.join(sorted(matching_names)))
+            name, ' '.join(sorted(matching_names))
+        )
         print(fill(message), file=sys.stderr)
         sys.exit(2)
+
 
 def say(title, *words):
     print(fill(title.ljust(36, '.') + ' ' + ' '.join(str(w) for w in words)))
 
+
 def fill(text):
-    return textwrap.fill(text, subsequent_indent='    ',
-                         break_long_words=False, break_on_hyphens=False)
+    return textwrap.fill(
+        text,
+        subsequent_indent='    ',
+        break_long_words=False,
+        break_on_hyphens=False,
+    )
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Protect a socket with TLS')
     parser.add_argument('host', help='hostname or IP address')
     parser.add_argument('port', type=int, help='TCP port number')
-    parser.add_argument('-a', metavar='cafile', default=None,
-                        help='authority: path to CA certificate PEM file')
-    parser.add_argument('-c', metavar='certfile', default=None,
-                        help='path to PEM file with client certificate')
-    parser.add_argument('-C', metavar='ciphers', default='ALL',
-                        help='list of ciphers, formatted per OpenSSL')
-    parser.add_argument('-p', metavar='PROTOCOL', default='SSLv23',
-                        help='protocol version (default: "SSLv23")')
-    parser.add_argument('-s', metavar='certfile', default=None,
-                        help='run as server: path to certificate PEM file')
-    parser.add_argument('-d', action='store_true', default=False,
-                        help='debug mode: do not hide "ctypes" exceptions')
-    parser.add_argument('-v', action='store_true', default=False,
-                        help='verbose: print out remote certificate')
+    parser.add_argument(
+        '-a',
+        metavar='cafile',
+        default=None,
+        help='authority: path to CA certificate PEM file',
+    )
+    parser.add_argument(
+        '-c',
+        metavar='certfile',
+        default=None,
+        help='path to PEM file with client certificate',
+    )
+    parser.add_argument(
+        '-C',
+        metavar='ciphers',
+        default='ALL',
+        help='list of ciphers, formatted per OpenSSL',
+    )
+    parser.add_argument(
+        '-p',
+        metavar='PROTOCOL',
+        default='SSLv23',
+        help='protocol version (default: "SSLv23")',
+    )
+    parser.add_argument(
+        '-s',
+        metavar='certfile',
+        default=None,
+        help='run as server: path to certificate PEM file',
+    )
+    parser.add_argument(
+        '-d',
+        action='store_true',
+        default=False,
+        help='debug mode: do not hide "ctypes" exceptions',
+    )
+    parser.add_argument(
+        '-v',
+        action='store_true',
+        default=False,
+        help='verbose: print out remote certificate',
+    )
     args = parser.parse_args()
 
     address = (args.host, args.port)

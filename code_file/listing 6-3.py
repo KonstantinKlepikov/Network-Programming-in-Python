@@ -1,4 +1,7 @@
-import argparse, socket, ssl
+import argparse
+import socket
+import ssl
+
 
 def client(host, port, cafile=None):
     purpose = ssl.Purpose.SERVER_AUTH
@@ -14,6 +17,7 @@ def client(host, port, cafile=None):
         if not data:
             break
         print(repr(data))
+
 
 def server(host, port, certfile, cafile=None):
     purpose = ssl.Purpose.CLIENT_AUTH
@@ -32,14 +36,23 @@ def server(host, port, certfile, cafile=None):
     ssl_sock.sendall('Simple is better than complex.'.encode('ascii'))
     ssl_sock.close()
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Safe TLS client and server')
     parser.add_argument('host', help='hostname or IP address')
     parser.add_argument('port', type=int, help='TCP port number')
-    parser.add_argument('-a', metavar='cafile', default=None,
-                        help='authority: path to CA certificate PEM file')
-    parser.add_argument('-s', metavar='certfile', default=None,
-                        help='run as server: path to server PEM file')
+    parser.add_argument(
+        '-a',
+        metavar='cafile',
+        default=None,
+        help='authority: path to CA certificate PEM file',
+    )
+    parser.add_argument(
+        '-s',
+        metavar='certfile',
+        default=None,
+        help='run as server: path to server PEM file',
+    )
     args = parser.parse_args()
     if args.s:
         server(args.host, args.port, args.s, args.a)
