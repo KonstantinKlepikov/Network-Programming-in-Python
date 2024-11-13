@@ -23,7 +23,7 @@ def open_tls(context: ssl.SSLContext, address, server=False):
         return context.wrap_socket(raw_sock)
 
 
-def describe(ssl_sock: ssl.SSLContext, hostname, server=False, debug=False):
+def describe(ssl_sock: ssl.SSLSocket, hostname, server=False, debug=False):
     cert = ssl_sock.getpeercert()
     if cert is None:
         say('Peer certificate', 'none')
@@ -97,7 +97,7 @@ def SSL_get_version(ssl_sock):
     return version_bytestring.decode('ascii')
 
 
-def lookup(prefix, name):
+def lookup(prefix: str, name: str):
     if not name.startswith(prefix):
         name = prefix + name
     try:

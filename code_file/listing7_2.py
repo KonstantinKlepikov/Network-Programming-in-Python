@@ -1,4 +1,9 @@
-import argparse, random, socket, zen_utils
+import argparse
+import random
+import socket
+
+import zen_utils
+
 
 def client(address, cause_error=False):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -12,12 +17,18 @@ def client(address, cause_error=False):
         print(aphorism, zen_utils.recv_until(sock, b'.'))
     sock.close()
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Example client')
     parser.add_argument('host', help='IP or hostname')
     parser.add_argument('-e', action='store_true', help='cause an error')
-    parser.add_argument('-p', metavar='port', type=int, default=1060,
-                        help='TCP port (default 1060)')
+    parser.add_argument(
+        '-p',
+        metavar='port',
+        type=int,
+        default=1060,
+        help='TCP port (default 1060)',
+    )
     args = parser.parse_args()
     address = (args.host, args.p)
     client(address, args.e)
