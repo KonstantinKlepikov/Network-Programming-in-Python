@@ -1,9 +1,13 @@
-import select, zen_utils
+import select
+
+import zen_utils
+
 
 def all_events_forever(poll_object):
     while True:
         for fd, event in poll_object.poll():
             yield fd, event
+
 
 def serve(listener):
     sockets = {listener.fileno(): listener}
@@ -65,6 +69,7 @@ def serve(listener):
                 bytes_to_send[sock] = data[n:]
             else:
                 poll_object.modify(sock, select.POLLIN)
+
 
 if __name__ == '__main__':
     address = zen_utils.parse_command_line('low-level async server')

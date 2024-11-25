@@ -1,7 +1,9 @@
-import asyncio, zen_utils
+import asyncio
+
+import zen_utils
+
 
 class ZenServer(asyncio.Protocol):
-
     def connection_made(self, transport):
         self.transport = transport
         self.address = transport.get_extra_info('peername')
@@ -19,10 +21,14 @@ class ZenServer(asyncio.Protocol):
         if exc:
             print('Client {} error: {}'.format(self.address, exc))
         elif self.data:
-            print('Client {} sent {} but then closed'
-                  .format(self.address, self.data))
+            print(
+                'Client {} sent {} but then closed'.format(
+                    self.address, self.data
+                )
+            )
         else:
             print('Client {} closed socket'.format(self.address))
+
 
 if __name__ == '__main__':
     address = zen_utils.parse_command_line('asyncio server using callbacks')

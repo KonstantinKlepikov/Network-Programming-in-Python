@@ -1,7 +1,10 @@
-import asyncore, asynchat, zen_utils
+import asynchat
+import asyncore
+
+import zen_utils
+
 
 class ZenRequestHandler(asynchat.async_chat):
-
     def __init__(self, sock):
         asynchat.async_chat.__init__(self, sock)
         self.set_terminator(b'?')
@@ -16,11 +19,12 @@ class ZenRequestHandler(asynchat.async_chat):
         self.initiate_send()
         self.data = b''
 
-class ZenServer(asyncore.dispatcher):
 
+class ZenServer(asyncore.dispatcher):
     def handle_accept(self):
         sock, address = self.accept()
         ZenRequestHandler(sock)
+
 
 if __name__ == '__main__':
     address = zen_utils.parse_command_line('legacy "asyncore" server')

@@ -1,4 +1,7 @@
-import socket, sys, zen_utils
+import socket
+import sys
+
+import zen_utils
 
 if __name__ == '__main__':
     sock = socket.fromfd(0, socket.AF_INET, socket.SOCK_STREAM)

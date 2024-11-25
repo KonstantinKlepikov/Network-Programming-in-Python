@@ -1,4 +1,7 @@
-import asyncio, zen_utils
+import asyncio
+
+import zen_utils
+
 
 @asyncio.coroutine
 def handle_conversation(reader, writer):
@@ -10,14 +13,18 @@ def handle_conversation(reader, writer):
             more_data = yield from reader.read(4096)
             if not more_data:
                 if data:
-                    print('Client {} sent {!r} but then closed'
-                          .format(address, data))
+                    print(
+                        'Client {} sent {!r} but then closed'.format(
+                            address, data
+                        )
+                    )
                 else:
                     print('Client {} closed socket normally'.format(address))
                 return
             data += more_data
         answer = zen_utils.get_answer(data)
         writer.write(answer)
+
 
 if __name__ == '__main__':
     address = zen_utils.parse_command_line('asyncio server using coroutine')
