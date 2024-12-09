@@ -5,6 +5,7 @@ from jinja2 import Environment, PackageLoader
 app = Flask(__name__)
 get = Environment(loader=PackageLoader(__name__, 'templates')).get_template
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     username = request.form.get('username', '')
@@ -16,11 +17,13 @@ def login():
             return response
     return get('login.html').render(username=username)
 
+
 @app.route('/logout')
 def logout():
     response = redirect(url_for('login'))
     response.set_cookie('username', '')
     return response
+
 
 @app.route('/')
 def index():
@@ -28,8 +31,12 @@ def index():
     if not username:
         return redirect(url_for('login'))
     payments = bank.get_payments_of(bank.open_database(), username)
-    return get('index.html').render(payments=payments, username=username,
-        flash_messages=request.args.getlist('flash'))
+    return get('index.html').render(
+        payments=payments,
+        username=username,
+        flash_messages=request.args.getlist('flash'),
+    )
+
 
 @app.route('/pay', methods=['GET', 'POST'])
 def pay():
@@ -46,10 +53,15 @@ def pay():
             bank.add_payment(db, username, account, dollars, memo)
             db.commit()
             return redirect(url_for('index', flash='Payment successful'))
-        complaint = ('Dollars must be an integer' if not dollars.isdigit()
-                     else 'Please fill in all three fields')
-    return get('pay.html').render(complaint=complaint, account=account,
-                                  dollars=dollars, memo=memo)
+        complaint = (
+            'Dollars must be an integer'
+            if not dollars.isdigit()
+            else 'Please fill in all three fields'
+        )
+    return get('pay.html').render(
+        complaint=complaint, account=account, dollars=dollars, memo=memo
+    )
+
 
 if __name__ == '__main__':
     app.debug = True

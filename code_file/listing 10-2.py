@@ -1,5 +1,6 @@
 import time
 
+
 def app(environ, start_response):
     host = environ.get('HTTP_HOST', '127.0.0.1')
     path = environ.get('PATH_INFO', '/')
