@@ -1,6 +1,7 @@
 import os
 from ftplib import FTP
 
+
 def main():
     if os.path.exists('patch8.gz'):
         raise IOError('refusing to overwrite your patch8.gz file')
@@ -13,6 +14,7 @@ def main():
         ftp.retrbinary('RETR patch8.gz', f.write)
 
     ftp.quit()
+
 
 if __name__ == '__main__':
     main()
